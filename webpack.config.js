@@ -4,87 +4,86 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const purgecssConfig = {
-    content: [
-        '**/*.html',
-    ],
-    defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
+  content: ['**/*.html'],
+  defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || []
 };
 
 module.exports = (env, argv) => {
-    const devMode = argv.mode === 'development';
-    
-    return {
-        entry: {
-            bundle: './src/js/main.js',
-            styles: './src/css/main.css',
+  const devMode = argv.mode === 'development';
+
+  return {
+    entry: {
+      bundle: './src/js/main.js',
+      styles: './src/css/main.css'
+    },
+    output: {
+      path: path.join(__dirname, 'dist'),
+      filename: 'js/[name].js'
+    },
+    module: {
+      rules: [
+        // JavaScript
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]
+              ]
+            }
+          }
         },
-        output: {
-            path: path.join(__dirname, 'dist'),
-            filename: 'js/[name].js'
-        },
-        module: {
-            rules: [
-                // JavaScript
-                {
-                    test: /\.js$/,
-                    exclude: /node_modules/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: [
-                                ['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }],
-                            ],
-                        },
-                    },
-                },
-                // CSS
-                {
-                    test: /\.css$/,
-                    exclude: /node_modules/,
-                    use: [
-                        MiniCssExtractPlugin.loader,
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                url: false,
-                                import: false,
-                                importLoaders: 1,
-                            }
-                        },
-                        {
-                            loader: 'postcss-loader',
-                            options: {
-                                ident: 'postcss',
-                                plugins: (loader) => [
-                                    require('postcss-import')({ root: loader.resourcePath }),
-                                    require('tailwindcss'),
-                                    require('autoprefixer'),
-                                    ...devMode ? [] : [
-                                        require('@fullhuman/postcss-purgecss')(purgecssConfig),
-                                        require('cssnano')()
-                                    ],
-                                ],
-                            }
-                        },
-                    ],
-                },
-    
-            ],
-        },
-        plugins: [
-            new MiniCssExtractPlugin({ filename: 'css/[name].css' }),
-            new FriendlyErrorsWebpackPlugin(),
-            new BrowserSyncPlugin({
-                host: 'localhost',
-                port: 3000,
-                server: { baseDir: ['.'] },
-                ignored: /node_modules/,
-                injectCss: true,
-            }),
-        ],
-        stats: false,
-        watchOptions: {
-            ignored: /node_modules/,
+        // CSS
+        {
+          test: /\.css$/,
+          exclude: /node_modules/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                url: false,
+                import: false,
+                importLoaders: 1
+              }
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: loader => [
+                  require('postcss-import')({ root: loader.resourcePath }),
+                  require('tailwindcss'),
+                  require('autoprefixer'),
+                  ...(devMode
+                    ? []
+                    : [
+                        require('@fullhuman/postcss-purgecss')(purgecssConfig),
+                        require('cssnano')()
+                      ])
+                ]
+              }
+            }
+          ]
         }
-    };
+      ]
+    },
+    plugins: [
+      new MiniCssExtractPlugin({ filename: 'css/[name].css' }),
+      new FriendlyErrorsWebpackPlugin(),
+      new BrowserSyncPlugin({
+        host: 'localhost',
+        port: 3000,
+        server: { baseDir: ['.'] },
+        ignored: /node_modules/,
+        injectCss: true
+      })
+    ],
+    stats: false,
+    watchOptions: {
+      ignored: /node_modules/
+    }
+  };
 };
