@@ -1,4 +1,5 @@
 const path = require('path');
+const NunjucksWebpackPlugin = require('nunjucks-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
@@ -71,12 +72,15 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new NunjucksWebpackPlugin({ templates: [
+        { from: 'src/views/index.njk', to: 'index.html' }
+      ] }),
       new MiniCssExtractPlugin({ filename: 'css/[name].css' }),
       new FriendlyErrorsWebpackPlugin(),
       new BrowserSyncPlugin({
         host: 'localhost',
         port: 3000,
-        server: { baseDir: ['.'] },
+        server: { baseDir: ['dist'] },
         ignored: /node_modules/,
         injectCss: true
       })
