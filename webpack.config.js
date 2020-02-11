@@ -82,7 +82,6 @@ module.exports = (env, argv) => {
         port: 3000,
         server: { baseDir: ['dist'] },
         ignored: /node_modules/,
-        injectCss: true
       })
     ],
     stats: false,
