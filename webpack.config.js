@@ -1,4 +1,5 @@
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const NunjucksWebpackPlugin = require('nunjucks-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
@@ -72,6 +73,7 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      ...(devMode ? [] : [new CleanWebpackPlugin()]),
       new NunjucksWebpackPlugin({ templates: [
         { from: 'src/views/index.njk', to: 'index.html' }
       ] }),
